@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ishraque Zaman Borshon — AI for Materials, Thermal & Energy Systems</title>
+<meta name="description" content="PhD candidate building physics-informed deep learning for atomic-scale materials characterization, batteries, and thermal-energy systems. Three Q1 first-author papers, NSF-funded.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0E12;
+    --panel:#11171D;
+    --panel-2:#161E26;
+    --line:#222C36;
+    --teal:#0FB5BA;
+    --teal-dim:#0a8489;
+    --trace:#E8C547;
+    --bone:#E6EAED;
+    --muted:#A8BCCF;
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --maxw:1120px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);color:var(--bone);font-family:var(--body);
+    line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--teal);color:var(--ink)}
+
+  /* ---- signal strip divider ---- */
+  .strip{height:2px;width:100%;background:
+    repeating-linear-gradient(90deg,transparent 0 6px,var(--line) 6px 7px);
+    position:relative;opacity:.6}
+  .strip::after{content:"";position:absolute;top:0;left:0;height:2px;width:60px;
+    background:linear-gradient(90deg,transparent,var(--teal));animation:scan 6s linear infinite}
+  @keyframes scan{0%{left:-60px}100%{left:100%}}
+
+  /* ---- nav ---- */
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px clamp(20px,5vw,48px);
+    backdrop-filter:blur(10px);background:rgba(10,14,18,.55);
+    border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+  nav.scrolled{border-color:var(--line);background:rgba(10,14,18,.85)}
+  .brand{font-family:var(--mono);font-size:13px;letter-spacing:.05em;color:var(--bone)}
+  .brand b{color:var(--teal)}
+  .navlinks{display:flex;gap:26px;font-size:13.5px;font-weight:500;color:var(--muted)}
+  .navlinks a{transition:color .2s;position:relative}
+  .navlinks a:hover{color:var(--bone)}
+  .navlinks a::after{content:"";position:absolute;left:0;bottom:-4px;height:1px;width:0;background:var(--teal);transition:width .25s}
+  .navlinks a:hover::after{width:100%}
+  .navtoggle{display:none;background:none;border:1px solid var(--line);color:var(--bone);
+    border-radius:6px;padding:6px 10px;font-size:13px;cursor:pointer}
+
+  /* ---- hero ---- */
+  header{min-height:100vh;display:grid;grid-template-columns:1.05fr .95fr;
+    align-items:center;gap:40px;max-width:var(--maxw);margin:0 auto;
+    padding:120px clamp(20px,5vw,48px) 60px}
+  .eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--teal);margin-bottom:22px;
+    display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--teal)}
+  h1{font-family:var(--display);font-weight:700;line-height:1.02;
+    font-size:clamp(38px,6vw,68px);letter-spacing:-.02em;margin-bottom:8px}
+  h1 .grey{color:#C8A96E}
+  .roletag{font-family:var(--mono);font-size:clamp(14px,1.7vw,18px);color:var(--bone);
+    margin:18px 0 4px;height:1.4em}
+  .roletag .cursor{color:var(--teal);animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .lede{color:#C3CCD3;max-width:46ch;font-size:16.5px;margin:22px 0 30px}
+  .lede b{color:var(--bone);font-weight:600}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{font-family:var(--body);font-weight:600;font-size:14.5px;
+    padding:12px 22px;border-radius:8px;cursor:pointer;transition:transform .15s,background .2s,border-color .2s;
+    border:1px solid var(--line);background:transparent;color:var(--bone)}
+  .btn.primary{background:var(--teal);color:var(--ink);border-color:var(--teal)}
+  .btn.primary:hover{background:#16d3d8;transform:translateY(-2px)}
+  .btn.ghost:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+
+  /* hero visual */
+  .visual{position:relative;border:1px solid var(--line);border-radius:14px;
+    background:var(--panel);overflow:hidden;aspect-ratio:1/1.02}
+  .visual canvas{display:block;width:100%;height:100%}
+  .vis-label{position:absolute;font-family:var(--mono);font-size:11px;
+    letter-spacing:.08em;color:#C3CCD3;background:rgba(10,14,18,.88);
+    padding:4px 8px;border-radius:5px;border:1px solid var(--line)}
+  .vis-label.tl{top:12px;left:12px}
+  .vis-label.br{bottom:12px;right:12px;color:var(--teal);border-color:var(--teal-dim)}
+  .vis-mid{position:absolute;top:0;bottom:0;left:50%;width:1px;
+    background:linear-gradient(var(--teal),transparent);opacity:.5}
+
+  /* ---- stats ---- */
+  .stats{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,5vw,48px) 80px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .stat{background:var(--panel);padding:26px 22px}
+  .stat .num{font-family:var(--display);font-weight:700;font-size:clamp(28px,3.4vw,40px);
+    color:var(--teal);letter-spacing:-.02em}
+  .stat .lab{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.35}
+
+  /* ---- sections ---- */
+  section{max-width:var(--maxw);margin:0 auto;padding:90px clamp(20px,5vw,48px)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:42px}
+  .sec-num{font-family:var(--mono);font-size:13px;color:var(--teal)}
+  .sec-title{font-family:var(--display);font-weight:600;font-size:clamp(24px,3.2vw,34px);letter-spacing:-.01em}
+  .sec-sub{color:#C3CCD3;font-size:15px;margin-top:-30px;margin-bottom:40px;max-width:60ch}
+
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:start}
+  .about-grid p{color:#c3ccd3;font-size:16.5px;margin-bottom:18px}
+  .about-grid p b{color:var(--bone)}
+  .pillbox{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:24px}
+  .pillbox h4{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:14px}
+  .pill{display:inline-block;font-size:13px;font-family:var(--mono);color:var(--bone);
+    border:1px solid var(--line);border-radius:20px;padding:5px 12px;margin:0 6px 8px 0;background:var(--panel-2)}
+  .pill.hot{border-color:var(--teal-dim);color:var(--teal)}
+
+  /* ---- news ---- */
+  .news-list{display:grid;gap:12px}
+  .news-item{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+    padding:16px 18px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
+    transition:border-color .2s}
+  .news-item:hover{border-color:var(--teal-dim)}
+  .news-date{font-family:var(--mono);font-size:12px;color:var(--teal);white-space:nowrap;padding-top:2px}
+  .news-text{font-size:14.5px;color:#C3CCD3;line-height:1.5}
+  .news-text b{color:var(--bone)}
+  .news-tag{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--ink);
+    background:var(--teal);border-radius:4px;padding:2px 7px;margin-right:8px;vertical-align:middle}
+  .news-tag.gold{background:var(--trace)}
+
+  /* ---- profile photo ---- */
+  .profile-photo{width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;
+    border:1px solid var(--line);background:var(--panel-2);position:relative;
+    display:flex;align-items:center;justify-content:center;max-width:300px}
+  .profile-photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .profile-photo .photo-placeholder{text-align:center;color:var(--muted)}
+  .profile-photo .photo-placeholder svg{width:64px;height:64px;opacity:.4;margin-bottom:10px}
+  .profile-photo .photo-placeholder p{font-family:var(--mono);font-size:11px;padding:0 16px}
+  .photo-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .photo-links a{font-family:var(--mono);font-size:12px;color:var(--muted);
+    border:1px solid var(--line);border-radius:6px;padding:5px 10px;
+    transition:color .2s,border-color .2s}
+  .photo-links a:hover{color:var(--teal);border-color:var(--teal-dim)}
+
+  /* ---- dissertation ---- */
+  .diss{border:1px solid var(--teal-dim);border-radius:12px;background:var(--panel);
+    padding:22px 24px;margin-top:22px}
+  .diss-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--teal);margin-bottom:10px}
+  .diss h4{font-family:var(--display);font-weight:600;font-size:16px;margin-bottom:8px;line-height:1.35}
+  .diss p{font-size:14px;color:#B2BCC6;line-height:1.65}
+
+
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);
+    overflow:hidden;transition:transform .25s,border-color .25s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-5px);border-color:var(--teal-dim)}
+  .card-vis{height:130px;position:relative;border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .card-vis canvas{display:block;width:100%;height:100%}
+  .card-body{padding:20px 20px 22px;flex:1;display:flex;flex-direction:column}
+  .card-tag{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+  .card h3{font-family:var(--display);font-weight:600;font-size:18px;margin-bottom:8px;line-height:1.25}
+  .card p{font-size:14px;color:#B2BCC6;flex:1}
+  .card .metric{font-family:var(--mono);font-size:12.5px;color:var(--trace);margin-top:14px}
+  .card .metric a{text-decoration:none;transition:opacity .2s}
+  .card .metric a:hover{opacity:.75}
+
+  /* publications */
+  .pub{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;
+    padding:22px 0;border-bottom:1px solid var(--line);transition:padding-left .2s}
+  .pub:hover{padding-left:8px}
+  .pub:last-child{border-bottom:none}
+  .pub-badge{font-family:var(--mono);font-size:11px;color:var(--ink);background:var(--teal);
+    padding:5px 9px;border-radius:6px;font-weight:500;white-space:nowrap;align-self:start;margin-top:3px}
+  .pub-badge.rev{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .pub h3 a{color:inherit;text-decoration:none;transition:color .2s}
+  .pub h3 a:hover{color:var(--teal)}
+  a.pub-badge{text-decoration:none;transition:opacity .2s}
+  a.pub-badge:hover{opacity:.8}
+  .pub h3{font-family:var(--display);font-weight:500;font-size:17px;line-height:1.35;margin-bottom:5px}
+  .pub .venue{font-size:14px;color:#B2BCC6}
+  .pub .venue i{color:var(--bone);font-style:italic}
+  .pub-yr{font-family:var(--mono);font-size:14px;color:var(--teal);align-self:start;margin-top:3px}
+
+  .talks{margin-top:34px;display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .talk{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--panel)}
+  .talk .conf{font-family:var(--mono);font-size:12px;color:var(--teal);margin-bottom:6px}
+  .talk p{font-size:13.5px;color:#c3ccd3}
+  .talk .nom{color:var(--trace);font-size:12px;font-family:var(--mono);margin-top:6px}
+
+  /* timeline */
+  .timeline{position:relative;padding-left:30px}
+  .timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--line)}
+  .tl-item{position:relative;padding-bottom:34px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-27px;top:6px;width:13px;height:13px;
+    border-radius:50%;background:var(--ink);border:2px solid var(--teal)}
+  .tl-item .when{font-family:var(--mono);font-size:12.5px;color:var(--teal)}
+  .tl-item h3{font-family:var(--display);font-weight:600;font-size:18px;margin:4px 0 2px}
+  .tl-item .org{color:var(--bone);font-size:15px}
+  .tl-item .org span{color:var(--muted)}
+  .tl-item p{color:#B2BCC6;font-size:14.5px;margin-top:8px;max-width:70ch}
+
+  /* skills */
+  .skillgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .skillcol{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:22px}
+  .skillcol h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--teal);margin-bottom:14px}
+  .skillcol ul{list-style:none}
+  .skillcol li{font-size:14px;color:#c3ccd3;padding:4px 0;border-bottom:1px dotted var(--line)}
+  .skillcol li:last-child{border-bottom:none}
+
+  /* contact */
+  .contact{text-align:center;padding-bottom:40px}
+  .contact h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.5vw,48px);
+    letter-spacing:-.02em;margin-bottom:16px}
+  .contact h2 span{color:var(--teal)}
+  .contact p{color:#B2BCC6;max-width:50ch;margin:0 auto 30px;font-size:16.5px}
+  .links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .links a{font-family:var(--mono);font-size:14px;border:1px solid var(--line);
+    border-radius:8px;padding:11px 18px;transition:border-color .2s,color .2s,transform .15s;color:var(--bone)}
+  .links a:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+
+  footer{text-align:center;padding:40px 20px 50px;color:var(--muted);
+    font-family:var(--mono);font-size:12px;border-top:1px solid var(--line)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* responsive */
+  @media(max-width:900px){
+    header{grid-template-columns:1fr;padding-top:110px;gap:40px}
+    .visual{max-width:440px;width:100%;justify-self:start}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .about-grid{grid-template-columns:1fr;gap:30px}
+    .cards{grid-template-columns:1fr 1fr}
+    .skillgrid{grid-template-columns:1fr 1fr}
+    .talks{grid-template-columns:1fr}
+    .pub{grid-template-columns:auto 1fr;gap:14px}
+    .pub-yr{display:none}
+  }
+  @media(max-width:600px){
+    .navlinks{display:none}
+    .navlinks.open{display:flex;position:absolute;top:60px;right:16px;flex-direction:column;
+      background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px;gap:14px}
+    .navtoggle{display:block}
+    .cards,.skillgrid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .pub h3{font-size:15.5px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <a href="#top" class="brand">IZB<b>/</b>borshon</a>
+  <button class="navtoggle" aria-label="Toggle menu" onclick="document.getElementById('navlinks').classList.toggle('open')">Menu</button>
+  <div class="navlinks" id="navlinks">
+    <a href="#news">News</a>
+    <a href="#about">About</a>
+    <a href="#work">Work</a>
+    <a href="#pubs">Publications</a>
+    <a href="#experience">Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<a id="top"></a>
+<header>
+  <div class="hero-copy">
+    <div class="eyebrow">PhD Candidate · University of Arizona · Expected June 2026</div>
+    <h1>Ishraque<br>Zaman <span class="grey">Borshon</span></h1>
+    <div class="roletag"><span id="typed"></span><span class="cursor">_</span></div>
+    <p class="lede">I build <b>physics-informed deep learning</b> that turns noisy scientific signals into reliable inference, from atomic-resolution electron microscopy to <b>battery degradation</b> and <b>thermal-energy systems</b>. Three Q1 first-author papers, NSF-funded, with a track record of shipping real scientific software.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="#work">See the work</a>
+      <a class="btn ghost" href="https://github.com/iborshon/iborshon.github.io/raw/main/cv_ishraque_zaman_borshon.pdf" target="_blank" rel="noopener">Download CV ↓</a>
+      <a class="btn ghost" href="#contact">Get in touch</a>
+    </div>
+  </div>
+
+  <div class="visual" id="hero-vis" aria-label="Animation: a noisy microscopy signal resolving into a clean detected atomic structure">
+    <span class="vis-label tl">raw signal · noisy</span>
+    <span class="vis-mid"></span>
+    <span class="vis-label br">inferred · clean</span>
+    <canvas id="heroCanvas"></canvas>
+  </div>
+</header>
+
+<div class="stats reveal">
+  <div class="stat"><div class="num" data-target="3">0</div><div class="lab"><a href="https://scholar.google.com/citations?user=itxzK7sAAAAJ&hl=en" target="_blank" rel="noopener" style="color:inherit;border-bottom:1px dotted var(--teal)">Q1 first-author papers</a></div></div>
+  <div class="stat"><div class="num">NSF</div><div class="lab">Award No. 2311104, funded research</div></div>
+  <div class="stat"><div class="num" data-static="&lt;1% err">0</div><div class="lab">CFD-ML surrogate, Nusselt prediction</div></div>
+  <div class="stat"><div class="num" data-target="350" data-suffix="+">0</div><div class="lab">Undergraduates taught &amp; mentored</div></div>
+</div>
+
+<div class="strip"></div>
+
+<section id="news">
+  <div class="sec-head reveal">
+    <span class="sec-num">00</span>
+    <h2 class="sec-title">News &amp; updates</h2>
+  </div>
+  <div class="news-list reveal">
+    <div class="news-item">
+      <div class="news-date">Jun 2026</div>
+      <div class="news-text"><span class="news-tag">Talk</span><b>Presented at 249th ECS Meeting</b>, Seattle — "Transformer-enabled HAADF-STEM quantification of SEI grain boundaries for safety-relevant multiphysics modeling of Li-ion batteries."</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">2026</div>
+      <div class="news-text"><span class="news-tag">Paper</span>New first-author paper published: <b>"Evolution of grain boundaries in multi-principal alloys"</b> — <i>Computational Materials Science</i>, 268, 114628.</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">Nov 2025</div>
+      <div class="news-text"><span class="news-tag gold">Award</span><b>Best Poster Nominee</b> at MRS Fall Meeting, Boston — "Deep-learning analysis of microstructures in SEI and multi-principal element alloys."</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">2025</div>
+      <div class="news-text"><span class="news-tag">Paper</span>First-author paper published: <b>"Deep learning analysis of solid-electrolyte interphase microstructures in lithium-ion batteries"</b> — <i>Advanced Materials Interfaces</i>.</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">2024</div>
+      <div class="news-text"><span class="news-tag">Paper</span>First-author paper published in <b><i>npj Computational Materials</i></b> — predicting column heights and elemental composition in experimental TEM images of high-entropy oxides.</div>
+    </div>
+    <div class="news-item">
+      <div class="news-date">Aug 2023</div>
+      <div class="news-text"><span class="news-tag">Position</span>Started PhD at <b>University of Arizona</b> under Dr. Vitaliy Yurkiv, funded by NSF Award No. 2311104.</div>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="about">
+  <div class="sec-head reveal">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">The bridge between physics and data</h2>
+  </div>
+  <div class="about-grid reveal">
+    <div>
+      <p>My work sits at one recurring boundary: where a hard scientific measurement is too noisy, too sparse, or too expensive to read directly, and a model has to recover the structure underneath. I treat machine learning not as a black box but as a <b>physics-constrained instrument</b>, where simulation supplies the ground truth that experimental data alone cannot.</p>
+      <p>At the University of Arizona I develop Vision Transformers, U-Net, and Mask R-CNN pipelines for atomic-column segmentation, defect detection, and interface classification in STEM/TEM micrographs of electrochemical materials, linking what the image shows to degradation, state-of-health, and cycle life in lithium batteries.</p>
+      <p>Before that I spent years on the thermal-energy side: 3D CFD of solar cavity receivers, ground-source heat pump software used by engineers nationally, and techno-economic modeling with ORNL. That breadth is the point. The same instinct, <b>let the physics constrain the model</b>, carries across all of it.</p>
+
+      <div class="diss">
+        <div class="diss-label">PhD Dissertation</div>
+        <h4>Physics-Informed Deep Learning for Atomic-Scale Characterization of Electrochemical Energy Materials</h4>
+        <p>This dissertation develops a family of computer-vision pipelines that bridge high-resolution electron microscopy and physics-based simulation to characterize electrochemical materials at atomic resolution. The core challenge: experimental STEM/TEM images are too noisy and too sparsely labeled for standard supervised learning. The solution is a simulation-to-experiment transfer framework in which multislice STEM simulations (PyQSTEM) and DFT calculations generate physically consistent ground-truth annotations. These synthetic datasets train Vision Transformer, U-Net, and Mask R-CNN architectures that generalize to real experimental data. Applications span solid-electrolyte interphase (SEI) microstructure in lithium-ion batteries, elemental composition prediction in high-entropy oxides, and grain-boundary evolution in multi-principal-element alloys — each linking atomic-scale imaging features to macroscopic properties such as degradation and cycle life.</p>
+      </div>
+    </div>
+    <div>
+      <div class="profile-photo">
+        <div class="photo-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          <p>Add your photo: place <code>photo.jpg</code> in the repo root and update this src</p>
+        </div>
+      </div>
+      <div class="photo-links">
+        <a href="https://scholar.google.com/citations?user=itxzK7sAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
+        <a href="https://orcid.org/0000-0000-0000-0000" target="_blank" rel="noopener">ORCID</a>
+        <a href="https://www.researchgate.net/profile/Ishraque-Zaman-Borshon" target="_blank" rel="noopener">ResearchGate</a>
+        <a href="https://www.linkedin.com/in/borshon/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/iborshon/" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div class="pillbox" style="margin-top:18px">
+        <h4>Currently working across</h4>
+        <span class="pill hot">Computer vision for microscopy</span>
+        <span class="pill hot">Battery / SEI degradation</span>
+        <span class="pill">Physics-informed ML</span>
+        <span class="pill">CFD surrogate modeling</span>
+        <span class="pill">Scientific software</span>
+        <span class="pill">HPC / GPU training</span>
+        <span class="pill">Thermal-energy systems</span>
+        <h4 style="margin-top:20px">Anchored by</h4>
+        <span class="pill">NSF Award 2311104</span>
+        <span class="pill">ORNL TM-2023/2933</span>
+        <span class="pill">GHEDesigner (NREL SWR-23-33)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="work">
+  <div class="sec-head reveal">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">Selected work</h2>
+  </div>
+  <p class="sec-sub reveal">Each tile below renders its own generative motif, a small nod to the kind of data the project actually deals with.</p>
+  <div class="cards">
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="atoms"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Materials AI · Computer vision</div>
+        <h3>SEI microstructure analysis in Li-ion batteries</h3>
+        <p>Deep-learning segmentation of solid-electrolyte interphase structures from atomic-resolution STEM/TEM, with physics-informed, simulation-derived ground truth for robust inference on low-contrast data.</p>
+        <div class="metric"><a href="https://doi.org/10.1002/admi.202400558" target="_blank" rel="noopener" style="color:inherit">→ Advanced Materials Interfaces (2025)</a></div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="lattice"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Materials AI · Regression</div>
+        <h3>Column heights &amp; composition in high-entropy oxides</h3>
+        <p>Deep-learning regression on experimental TEM images to predict atomic column heights and elemental composition, tying imaging features to structure–property relationships via DFT-informed workflows.</p>
+        <div class="metric"><a href="https://doi.org/10.1038/s41524-024-01469-4" target="_blank" rel="noopener" style="color:inherit">→ npj Computational Materials (2024)</a></div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="grain"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Materials AI · Microstructure</div>
+        <h3>Grain-boundary evolution in multi-principal alloys</h3>
+        <p>Analysis of grain boundaries in multi-principal-element alloys, probing phase stability and structural complexity with deep-learning and transformer-based methods.</p>
+        <div class="metric"><a href="https://doi.org/10.1016/j.commatsci.2025.114628" target="_blank" rel="noopener" style="color:inherit">→ Computational Materials Science (2026)</a></div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="flow"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Thermal · CFD + ML surrogate</div>
+        <h3>CSP cavity receiver, CFD-informed surrogate</h3>
+        <p>3D CFD in ANSYS Fluent of a helical solar cavity receiver, distilled into a Random Forest surrogate that predicts Nusselt number and heat loss, then deployed as a web prediction tool.</p>
+        <div class="metric"><a href="https://ishraque2008-random-forest-heat-transfer-main-7jxm2v.streamlit.app" target="_blank" rel="noopener" style="color:inherit">→ &lt;1% prediction error · live Streamlit tool ↗</a></div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="grid"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Scientific software</div>
+        <h3>GHEDesigner &amp; GLHEPro</h3>
+        <p>Co-developed open-source (GHEDesigner) and commercial (GLHEPro) ground-source heat pump design tools. Scaled the borefield design space from 308 to 34,321 configurations.</p>
+        <div class="metric"><a href="https://github.com/BETSRG/GHEDesigner" target="_blank" rel="noopener" style="color:inherit">→ NREL SWR-23-33 · used by engineers nationally ↗</a></div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="card-vis"><canvas data-motif="report"></canvas></div>
+      <div class="card-body">
+        <div class="card-tag">Energy systems · National lab</div>
+        <h3>Geothermal techno-economic modeling, ORNL</h3>
+        <p>Numerical and techno-economic modeling for residential and commercial geothermal heat pump applications, with sensitivity analysis and automated reporting pipelines.</p>
+        <div class="metric"><a href="https://www.osti.gov/biblio/2315200" target="_blank" rel="noopener" style="color:inherit">→ ORNL Technical Report TM-2023/2933 ↗</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="pubs">
+  <div class="sec-head reveal">
+    <span class="sec-num">03</span>
+    <h2 class="sec-title">Publications</h2>
+  </div>
+  <p class="sec-sub reveal">First-author across three Q1 journals at the intersection of AI and materials science.</p>
+
+  <div class="reveal">
+    <div class="pub">
+      <a class="pub-badge" href="https://doi.org/10.1016/j.commatsci.2025.114628" target="_blank" rel="noopener">Comp. Mater. Sci.</a>
+      <div>
+        <h3><a href="https://doi.org/10.1016/j.commatsci.2025.114628" target="_blank" rel="noopener">Evolution of grain boundaries in multi-principal alloys: insights into phase stability and structural complexity</a></h3>
+        <div class="venue">Borshon, I. Z., Amiri, A., Mashayek, F., Shahbazian-Yassar, R., Yurkiv, V. · <i>Computational Materials Science</i>, 268, 114628</div>
+      </div>
+      <span class="pub-yr">2026</span>
+    </div>
+    <div class="pub">
+      <a class="pub-badge" href="https://doi.org/10.1002/admi.202400558" target="_blank" rel="noopener">Adv. Mater. Interfaces</a>
+      <div>
+        <h3><a href="https://doi.org/10.1002/admi.202400558" target="_blank" rel="noopener">Deep learning analysis of solid-electrolyte interphase microstructures in lithium-ion batteries</a></h3>
+        <div class="venue">Borshon, I. Z., Jabbari, V., Kingston, T. A., Shahbazian-Yassar, R., Yurkiv, V. R. · <i>Advanced Materials Interfaces</i>, e00558</div>
+      </div>
+      <span class="pub-yr">2025</span>
+    </div>
+    <div class="pub">
+      <a class="pub-badge" href="https://doi.org/10.1038/s41524-024-01469-4" target="_blank" rel="noopener">npj Comput. Mater.</a>
+      <div>
+        <h3><a href="https://doi.org/10.1038/s41524-024-01469-4" target="_blank" rel="noopener">Predicting column heights and elemental composition in experimental TEM images of high-entropy oxides using deep learning</a></h3>
+        <div class="venue">Borshon, I. Z., Ragone, M., Phakatkar, A. H., Long, L., Shahbazian-Yassar, R., et al. · <i>npj Computational Materials</i>, 10, 275</div>
+      </div>
+      <span class="pub-yr">2024</span>
+    </div>
+    <div class="pub">
+      <span class="pub-badge rev">Under review</span>
+      <div>
+        <h3>Heat loss mechanisms in helical solar cavity receivers: a combined experimental and 3D numerical study</h3>
+        <div class="venue">Borshon, I. Z., Kumar, S., Kedare, S. B. · <i>Solar Energy</i></div>
+      </div>
+      <span class="pub-yr">2026</span>
+    </div>
+    <div class="pub">
+      <span class="pub-badge rev">Under review</span>
+      <div>
+        <h3>ML-driven structure–property relationships in high-entropy alloys: a comprehensive review</h3>
+        <div class="venue">Borshon, I. Z., et al. · <i>Progress in Materials Science</i></div>
+      </div>
+      <span class="pub-yr">2026</span>
+    </div>
+  </div>
+
+  <div class="talks reveal">
+    <div class="talk">
+      <div class="conf">249th ECS Meeting · Seattle · 2026</div>
+      <p>Transformer-enabled HAADF-STEM quantification of SEI grain boundaries for safety-relevant multiphysics modeling of Li-ion batteries</p>
+    </div>
+    <div class="talk">
+      <div class="conf">MRS Fall Meeting · Boston · 2025</div>
+      <p>Deep-learning analysis of microstructures in SEI and multi-principal element alloys</p>
+      <div class="nom">★ Best Poster Nominee</div>
+    </div>
+    <div class="talk">
+      <div class="conf">PRiME 2024 (ECS) · Honolulu · 2024</div>
+      <p>Deep-learning analysis of solid-electrolyte interface microstructures in lithium-ion batteries</p>
+    </div>
+    <div class="talk">
+      <div class="conf">IGSHPA Conference · Las Vegas · 2022</div>
+      <p>Open library of g-functions for 34,321 configurations</p>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="experience">
+  <div class="sec-head reveal">
+    <span class="sec-num">04</span>
+    <h2 class="sec-title">Experience</h2>
+  </div>
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="when">Aug 2023 — Present</div>
+      <h3>Doctoral Researcher &amp; Teaching Assistant</h3>
+      <div class="org">University of Arizona <span>· Tucson, AZ · Advisor: Dr. Vitaliy Yurkiv</span></div>
+      <p>Physics-informed deep learning for atomic-scale characterization of electrochemical energy materials. Built simulation-to-experiment CV pipelines on GPU HPC clusters. TA for Thermodynamics (AME 230) and Heat Transfer (AME 432), 350+ students total.</p>
+    </div>
+    <div class="tl-item">
+      <div class="when">Aug 2021 — Jul 2023</div>
+      <h3>Graduate Research Assistant</h3>
+      <div class="org">Oklahoma State University <span>· Stillwater, OK · Advisor: Prof. Jeffrey Spitler</span></div>
+      <p>Co-developed GLHEPro and GHEDesigner ground-source heat pump software; contributed to the ORNL geothermal techno-economic modeling report. Built CFD-informed ML surrogates and Python analytics pipelines.</p>
+    </div>
+    <div class="tl-item">
+      <div class="when">Jul 2019 — Jul 2021</div>
+      <h3>Graduate Research Assistant (M.Tech)</h3>
+      <div class="org">IIT Bombay <span>· Mumbai, India · Advisor: Dr. Shireesh B. Kedare</span></div>
+      <p>3D CFD of high-temperature solar cavity receivers; derived Nusselt correlations and built Random Forest surrogates with &lt;1% prediction error, deployed as a web tool.</p>
+    </div>
+    <div class="tl-item">
+      <div class="when">May 2018 — Jun 2019</div>
+      <h3>Sales Engineer</h3>
+      <div class="org">Petrochem (Bangladesh) Limited <span>· Dhaka, Bangladesh</span></div>
+      <p>Designed and serviced solar irrigation and PV systems. Led a 12-person engineering team and business development for six foreign partners, contributing a 5% revenue increase.</p>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="skills">
+  <div class="sec-head reveal">
+    <span class="sec-num">05</span>
+    <h2 class="sec-title">Technical toolkit</h2>
+  </div>
+  <div class="skillgrid reveal">
+    <div class="skillcol">
+      <h4>ML &amp; Deep Learning</h4>
+      <ul>
+        <li>Vision Transformers, U-Net, Mask R-CNN</li>
+        <li>Segmentation, detection, regression</li>
+        <li>Physics-informed &amp; sim-to-real transfer</li>
+        <li>Active learning, VAEs, Bayesian UQ</li>
+        <li>Time-series for SOH / degradation</li>
+      </ul>
+    </div>
+    <div class="skillcol">
+      <h4>Frameworks &amp; Compute</h4>
+      <ul>
+        <li>PyTorch, PyTorch Lightning, TensorFlow</li>
+        <li>scikit-learn, OpenCV, NumPy, Pandas</li>
+        <li>GPU HPC clusters · SLURM</li>
+        <li>Streamlit, Matplotlib, Plotly</li>
+        <li>Git, Linux, Docker (exposure)</li>
+      </ul>
+    </div>
+    <div class="skillcol">
+      <h4>Languages</h4>
+      <ul>
+        <li>Python (primary), C, Julia</li>
+        <li>VB.NET, VBA, C#, MATLAB</li>
+        <li>SQL · LaTeX</li>
+        <li>C++ / Rust (familiarity)</li>
+      </ul>
+    </div>
+    <div class="skillcol">
+      <h4>Microscopy &amp; Materials</h4>
+      <ul>
+        <li>STEM / TEM / SEM, HAADF-STEM, cryo</li>
+        <li>Atomic-column segmentation, defects</li>
+        <li>Multislice STEM simulation (PyQSTEM)</li>
+        <li>DFT-based atomistic simulation</li>
+        <li>Electrochemical characterization (CV, EIS)</li>
+      </ul>
+    </div>
+    <div class="skillcol">
+      <h4>Thermal &amp; Energy</h4>
+      <ul>
+        <li>ANSYS Fluent (3D CFD/FEA), COMSOL</li>
+        <li>Heat transfer, fluid mechanics, cycles</li>
+        <li>Geothermal / GSHP, CSP systems</li>
+        <li>HVAC &amp; building-load analysis</li>
+        <li>EnergyPlus (exposure)</li>
+      </ul>
+    </div>
+    <div class="skillcol">
+      <h4>Agentic AI &amp; LLMs</h4>
+      <ul>
+        <li>RAG pipelines, vector databases</li>
+        <li>Prompt engineering, LLM fine-tuning</li>
+        <li>LangGraph, Claude Agent SDK</li>
+        <li>Multi-agent orchestration</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="strip"></div>
+
+<section id="contact" class="contact">
+  <div class="reveal">
+    <h2>Let's build something <span>at the boundary.</span></h2>
+    <p>Open to roles in applied ML research, materials &amp; battery AI, scientific software, and thermal-energy systems. Always glad to talk through a hard inference problem.</p>
+    <div class="links">
+      <a href="mailto:ishraque@arizona.edu">ishraque@arizona.edu</a>
+      <a href="https://www.linkedin.com/in/borshon/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/iborshon/" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://scholar.google.com/citations?user=itxzK7sAAAAJ&hl=en" target="_blank" rel="noopener">Google Scholar</a>
+      <a href="https://orcid.org/0000-0000-0000-0000" target="_blank" rel="noopener">ORCID</a>
+      <a href="https://www.researchgate.net/profile/Ishraque-Zaman-Borshon" target="_blank" rel="noopener">ResearchGate</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © <span id="yr"></span> Ishraque Zaman Borshon · Tucson, AZ · Built to show, not just tell
+</footer>
+
+<script>
+// year
+document.getElementById('yr').textContent=new Date().getFullYear();
+
+// nav scroll state
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30));
+
+// close mobile menu on click
+document.querySelectorAll('#navlinks a').forEach(a=>a.addEventListener('click',()=>document.getElementById('navlinks').classList.remove('open')));
+
+// typed role tagline
+const roles=['AI for materials characterization','Computer vision for microscopy','Battery degradation & SEI analysis','Physics-informed deep learning','CFD surrogate modeling','Scientific software, shipped'];
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const typedEl=document.getElementById('typed');
+if(reduce){typedEl.textContent=roles[0];}
+else{
+  let ri=0,ci=0,del=false;
+  (function tick(){
+    const w=roles[ri];
+    typedEl.textContent=del?w.slice(0,ci--):w.slice(0,ci++);
+    let d=del?40:75;
+    if(!del&&ci>w.length){d=1500;del=true;}
+    else if(del&&ci<0){del=false;ci=0;ri=(ri+1)%roles.length;d=350;}
+    setTimeout(tick,d);
+  })();
+}
+
+// reveal on scroll
+const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// count-up stats
+const statsIo=new IntersectionObserver((es)=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.querySelectorAll('.num[data-static]').forEach(n=>{n.textContent=n.dataset.static;});
+  e.target.querySelectorAll('.num[data-target]').forEach(n=>{
+    const t=+n.dataset.target,suf=n.dataset.suffix||'';
+    if(reduce){n.textContent=t+suf;return;}
+    let c=0;const step=Math.max(1,t/40);
+    (function up(){c+=step;if(c>=t){n.textContent=t+suf;}else{n.textContent=Math.floor(c)+suf;requestAnimationFrame(up);}})();
+  });
+  statsIo.unobserve(e.target);
+}),{threshold:.4});
+document.querySelectorAll('.stats').forEach(s=>statsIo.observe(s));
+
+// ---------- HERO CANVAS: noisy signal -> clean detected lattice ----------
+(function(){
+  const cv=document.getElementById('heroCanvas');
+  const ctx=cv.getContext('2d');
+  let W,H,DPR;
+  function resize(){
+    DPR=Math.min(devicePixelRatio||1,2);
+    const r=cv.getBoundingClientRect();
+    W=r.width;H=r.height;
+    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  resize();addEventListener('resize',resize);
+
+  // lattice of atom sites
+  const cols=9,rows=9,sites=[];
+  function buildSites(){
+    sites.length=0;
+    const mx=W*0.12,my=H*0.12,gw=(W-2*mx)/(cols-1),gh=(H-2*my)/(rows-1);
+    for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+      sites.push({x:mx+i*gw+(j%2?gw*0.5:0),y:my+j*gh,
+        ph:Math.random()*Math.PI*2});
+    }
+  }
+  buildSites();
+  addEventListener('resize',buildSites);
+
+  let t=0;
+  function frame(){
+    t+=0.012;
+    ctx.clearRect(0,0,W,H);
+    // sweep position: 0..1 left->right, the "inference front"
+    const sweep=(Math.sin(t*0.5)*0.5+0.5);
+    const frontX=sweep*W;
+
+    // background noise on the raw (right of front is raw... we flip: left=clean)
+    // draw noise field
+    const noiseN=Math.floor((W*H)/2600);
+    ctx.fillStyle='rgba(122,134,145,0.28)';
+    for(let k=0;k<noiseN;k++){
+      const x=Math.random()*W,y=Math.random()*H;
+      if(x<frontX) continue; // cleaned region has less noise
+      ctx.fillRect(x,y,1.2,1.2);
+    }
+
+    // bonds between neighboring clean sites (only where cleaned)
+    ctx.strokeStyle='rgba(15,181,186,0.18)';ctx.lineWidth=1;
+    for(let a=0;a<sites.length;a++){
+      for(let b=a+1;b<sites.length;b++){
+        const dx=sites[a].x-sites[b].x,dy=sites[a].y-sites[b].y;
+        const d=Math.hypot(dx,dy);
+        if(d< (W*0.16)){
+          if(sites[a].x<frontX && sites[b].x<frontX){
+            ctx.beginPath();ctx.moveTo(sites[a].x,sites[a].y);ctx.lineTo(sites[b].x,sites[b].y);ctx.stroke();
+          }
+        }
+      }
+    }
+
+    // atom sites
+    sites.forEach(s=>{
+      const cleaned=s.x<frontX;
+      const jitter=cleaned?0:2.4; // raw atoms wobble
+      const jx=Math.cos(t*3+s.ph)*jitter, jy=Math.sin(t*3+s.ph)*jitter;
+      const r=cleaned?3.4:2.2;
+      // glow on the front edge
+      const nearFront=Math.abs(s.x-frontX)<22;
+      if(cleaned){
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,r+ (nearFront?3:0),0,Math.PI*2);
+        ctx.fillStyle=nearFront?'rgba(232,197,71,0.95)':'rgba(15,181,186,0.95)';
+        ctx.fill();
+        // ring
+        ctx.beginPath();ctx.arc(s.x,s.y,r+4,0,Math.PI*2);
+        ctx.strokeStyle='rgba(15,181,186,0.25)';ctx.lineWidth=1;ctx.stroke();
+      }else{
+        ctx.beginPath();
+        ctx.arc(s.x+jx,s.y+jy,r,0,Math.PI*2);
+        ctx.fillStyle='rgba(170,180,190,0.5)';
+        ctx.fill();
+      }
+    });
+
+    // the scanning inference front line
+    const grad=ctx.createLinearGradient(frontX-40,0,frontX+8,0);
+    grad.addColorStop(0,'rgba(15,181,186,0)');
+    grad.addColorStop(1,'rgba(15,181,186,0.7)');
+    ctx.fillStyle=grad;
+    ctx.fillRect(frontX-40,0,48,H);
+    ctx.fillStyle='rgba(232,197,71,0.9)';
+    ctx.fillRect(frontX-1,0,2,H);
+
+    requestAnimationFrame(frame);
+  }
+  if(reduce){
+    // static clean lattice
+    buildSites();ctx.clearRect(0,0,W,H);
+    sites.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,3.4,0,7);ctx.fillStyle='rgba(15,181,186,0.9)';ctx.fill();});
+  }else{requestAnimationFrame(frame);}
+})();
+
+// ---------- CARD MOTIFS ----------
+document.querySelectorAll('.card-vis canvas').forEach(cv=>{
+  const ctx=cv.getContext('2d');
+  const motif=cv.dataset.motif;
+  let W,H,DPR;
+  function rs(){DPR=Math.min(devicePixelRatio||1,2);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+  rs();addEventListener('resize',rs);
+  let t=Math.random()*10;
+  const teal='rgba(15,181,186,', gold='rgba(232,197,71,';
+  function draw(){
+    t+=0.02;ctx.clearRect(0,0,W,H);
+    if(motif==='atoms'||motif==='lattice'){
+      const n=motif==='atoms'?5:6;const mx=18,gw=(W-2*mx)/(n-1),gh=(H-30)/(n-1);
+      for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+        const x=mx+i*gw+(motif==='atoms'&&j%2?gw*.5:0),y=15+j*gh;
+        const p=Math.sin(t+i*.6+j*.4)*.5+.5;
+        ctx.beginPath();ctx.arc(x,y,2.4+p*1.6,0,7);
+        ctx.fillStyle=(i+j)%4===0?gold+(0.5+p*0.4)+')':teal+(0.4+p*0.5)+')';ctx.fill();
+      }
+    }else if(motif==='grain'){
+      ctx.lineWidth=1.2;
+      for(let k=0;k<7;k++){
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=6){
+          const y=H/2+Math.sin(x*0.03+t+k)*12*Math.sin(k+t*.3)+(k-3)*16;
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=teal+(0.15+0.07*k)+')';ctx.stroke();
+      }
+    }else if(motif==='flow'){
+      const N=26;
+      for(let i=0;i<N;i++){
+        const y=10+(H-20)*i/N;
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=8){
+          const yy=y+Math.sin(x*0.04+t*1.5+i*0.3)*(4+i*0.1);
+          x===0?ctx.moveTo(x,yy):ctx.lineTo(x,yy);
+        }
+        ctx.strokeStyle=teal+(0.1+0.5*(i/N))+')';ctx.lineWidth=1;ctx.stroke();
+      }
+    }else if(motif==='grid'){
+      const c=8,rgw=(W-20)/c,rgh=(H-20)/c;
+      for(let i=0;i<c;i++)for(let j=0;j<c;j++){
+        const on=((i*3+j*5+Math.floor(t*2))%7)<2;
+        ctx.fillStyle=on?gold+'0.6)':teal+'0.18)';
+        ctx.fillRect(10+i*rgw,10+j*rgh,rgw-3,rgh-3);
+      }
+    }else if(motif==='report'){
+      for(let i=0;i<5;i++){
+        const h=(Math.sin(t+i)*0.5+0.6)*(H-40);
+        const bw=(W-40)/5;
+        ctx.fillStyle=i===2?gold+'0.7)':teal+'0.4)';
+        ctx.fillRect(15+i*bw,H-15-h,bw-8,h);
+      }
+      ctx.strokeStyle=teal+'0.2)';ctx.beginPath();ctx.moveTo(10,H-15);ctx.lineTo(W-10,H-15);ctx.stroke();
+    }
+    if(!reduce)requestAnimationFrame(draw);
+  }
+  draw();
+});
+</script>
+</body>
+</html>
